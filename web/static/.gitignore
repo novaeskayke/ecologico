@@ -1,0 +1,15 @@
+cat > .gitignore <<'EOF'
+out/
+*.class
+ecologico.db
+
+rm -f lib/sqlite-jdbc-3.41.2.2.jar.txt
+touch lib/.gitkeep
+
+curl -L -o lib/sqlite-jdbc-3.41.2.2.jar https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.41.2.2/sqlite-jdbc-3.41.2.2.jar
+
+# editor / sistema
+.vscode/
+.idea/
+.DS_Store
+EOF
