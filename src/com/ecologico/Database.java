@@ -25,16 +25,20 @@ public class Database {
     /** Descobre o id do último registro inserido nesta conexão. */
     public static int ultimoId(Connection con) throws SQLException {
         try (Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery("SELECT last_insert_rowid()")) {
+                ResultSet rs = st.executeQuery("SELECT last_insert_rowid()")) {
             return rs.next() ? rs.getInt(1) : -1;
         }
     }
 
-    /** Cria as tabelas (se ainda não existirem) e, se o banco estiver vazio, coloca dados de exemplo. */
+    /**
+     * Cria as tabelas (se ainda não existirem) e, se o banco estiver vazio, coloca
+     * dados de exemplo.
+     */
     public static void iniciar() throws SQLException {
         try (Connection con = getConnection(); Statement st = con.createStatement()) {
 
-            // 1) Catálogo de alimentos. "nome_busca" guarda o nome sem acento/maiúscula, só para pesquisar.
+            // 1) Catálogo de alimentos. "nome_busca" guarda o nome sem acento/maiúscula, só
+            // para pesquisar.
             st.execute("CREATE TABLE IF NOT EXISTS produtos ("
                     + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + "nome TEXT NOT NULL UNIQUE, "
@@ -71,7 +75,8 @@ public class Database {
                     + "FOREIGN KEY (produtor_id) REFERENCES produtores(id), "
                     + "FOREIGN KEY (produto_id) REFERENCES produtos(id))");
 
-            // 5) Quanto foi vendido de cada produto em cada mês (base da estimativa de plantio)
+            // 5) Quanto foi vendido de cada produto em cada mês (base da estimativa de
+            // plantio)
             st.execute("CREATE TABLE IF NOT EXISTS historico_consumo ("
                     + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + "produto_id INTEGER NOT NULL, "
@@ -81,7 +86,8 @@ public class Database {
 
             int totalProdutos = 0;
             try (ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM produtos")) {
-                if (rs.next()) totalProdutos = rs.getInt(1);
+                if (rs.next())
+                    totalProdutos = rs.getInt(1);
             }
             if (totalProdutos == 0) {
                 inserirExemplos(con, st);
@@ -92,8 +98,8 @@ public class Database {
     /** Dados de exemplo, para o protótipo já nascer com algo para testar. */
     private static void inserirExemplos(Connection con, Statement st) throws SQLException {
         String[][] produtos = {
-            {"Maçã", "Fruta"}, {"Alface", "Verdura"}, {"Tomate", "Legume"},
-            {"Banana", "Fruta"}, {"Cenoura", "Legume"}
+                { "Maçã", "Fruta" }, { "Alface", "Verdura" }, { "Tomate", "Legume" },
+                { "Banana", "Fruta" }, { "Cenoura", "Legume" }
         };
         try (PreparedStatement ps = con.prepareStatement(
                 "INSERT INTO produtos (nome, nome_busca, categoria) VALUES (?,?,?)")) {
@@ -116,19 +122,24 @@ public class Database {
                 + "('Fazenda Verde Vida', 'contato@verdevida.com', '(15) 99999-0002', 'Sorocaba', 'Campolim', -23.4900, -47.4650), "
                 + "('Horta Comunitária Votorantim', 'contato@hortavotorantim.com', '(15) 99999-0003', 'Votorantim', 'Centro', -23.5467, -47.4387)");
 
-        st.executeUpdate("INSERT INTO disponibilidade (produtor_id, produto_id, quantidade_disponivel, unidade, preco) VALUES "
-                + "(1, 1, 120, 'kg', 4.50), "
-                + "(2, 1, 80, 'kg', 4.20), "
-                + "(2, 3, 200, 'kg', 3.80), "
-                + "(3, 2, 60, 'kg', 3.00)");
+        st.executeUpdate(
+                "INSERT INTO disponibilidade (produtor_id, produto_id, quantidade_disponivel, unidade, preco) VALUES "
+                        + "(1, 1, 120, 'kg', 4.50), "
+                        + "(2, 1, 80, 'kg', 4.20), "
+                        + "(2, 3, 200, 'kg', 3.80), "
+                        + "(3, 2, 60, 'kg', 3.00)");
     }
 
-    /** Monta uma tabela HTML com TODO o conteúdo de uma tabela do banco (usado na página "Ver banco de dados"). */
+    /**
+     * Monta uma tabela HTML com TODO o conteúdo de uma tabela do banco (usado na
+     * página "Ver banco de dados").
+     */
+
     public static String tabelaComoHtml(String nomeDaTabela) throws SQLException {
         StringBuilder html = new StringBuilder();
         try (Connection con = getConnection();
-             Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery("SELECT * FROM " + nomeDaTabela)) {
+                Statement st = con.createStatement();
+                ResultSet rs = st.executeQuery("SELECT * FROM " + nomeDaTabela)) {
             ResultSetMetaData meta = rs.getMetaData();
             int colunas = meta.getColumnCount();
 
